@@ -27,6 +27,13 @@ void setup() {
   myPrinter.setHeat(9, 186, 2);
   myPrinter.autoCalculate(true);
 
+  
+  bool waiting = true;
+  while(waiting){
+    waiting = wait_for_inital_press();
+    myPrinter.printFromSerial();  // open monitor and print something
+  }
+  
   beginning_sequence();
 
   //myPrinter.identifyChars("ą ę");  // UTF-8
@@ -58,6 +65,17 @@ void beginning_sequence() {
   myPrinter.unsetMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
   double_println("and I've got a qustion for you,");
   myPrinter.feed(1);
+
+  ask_if_they_can_vote(); //QUESTION #1
+
+  double_println("In that case I've got another qustion for you,");
+
+  myPrinter.feed(1);
+
+  ask_if_they_can_talk(); //QUESTION #2
+
+}
+void ask_if_they_can_vote() {
   double_println("Are you old enough to vote?");
 
   myPrinter.setMode(FONT_B);
@@ -66,71 +84,102 @@ void beginning_sequence() {
 
   myPrinter.feed(2);
 
-  myPrinter.println("DEFAULT FONT_A");
+  myPrinter.unsetMode(FONT_B);
 
   bool valid_response = false;
   while (valid_response == false) {
     int response1 = wait_for_response();
-    
+
     if (response1 == 1) {
       double_println("That's awesome! I wish I was old enough");
       myPrinter.feed(2);
       valid_response = true;
     }
     else if (response1 == 2) {
-      double_println("Do you think the voting age should be reduced so that you can vote?");
-      double_println("Press once for yes and twice for no");
-      myPrinter.feed(2);
-
-      bool valid2 = false;
-      while(valid2 == false){
-        int response2 = wait_for_response();
-        if (response2 == 1) {
-          double_println("Really!? but you cant even drink yet!,");
-          myPrinter.feed(2);
-          valid2 = true;
-        } 
-        else if (response2 == 2){
-          double_println("Wow you must be mature for your age");
-          myPrinter.feed(2);
-          valid2 = true;
-        }
-        else{
-          double_println("Woah there you pressed the button " + response2 + " times, try again");
-          myPrinter.feed(2);
-        }
-      }
+      ask_if_voting_age_should_be_reduced();
       valid_response = true;
-      
+
     }
-    else if (response1 == 3){
+    else if (response1 == 3) {
       double_println("The legal age to vote in Canada is 18, try answering again");
       myPrinter.feed(2);
-    }
-    else if (response1 == -1) {
-      //RESET THE PROGRAM
-      digitalWrite(4, LOW);//resetPin default = 4
     }
     else {
       double_println("Woah there you pressed the button " + response1 + " times, try again");
       myPrinter.feed(2);
     }
   }
-  
-  double_println("In that case I've got another qustion for you,");
-
-  myPrinter.feed(1);
-  double_println("Are you comfortable talking into the microphone?");
-
+}
+void ask_if_voting_age_should_be_reduced() {
+  double_println("Do you think the voting age should be reduced so that you can vote?");
   myPrinter.setMode(FONT_B);
   double_println("Press once for yes and twice for no");
-  //myPrinter.setMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
-
+  myPrinter.unsetMode(FONT_B);
   myPrinter.feed(2);
 
-  wait_for_response();
+  bool valid2 = false;
+  while (valid2 == false) {
+    int response2 = wait_for_response();
+    if (response2 == 1) {
+      double_println("Really!? but you cant even drink yet!,");
+      myPrinter.feed(2);
+      valid2 = true;
+    }
+    else if (response2 == 2) {
+      double_println("Wow you must be mature for your age");
+      myPrinter.feed(2);
+      valid2 = true;
+    }
+    else {
+      double_println("Woah there you pressed the button " + response2 + " times, try again");
+      myPrinter.feed(2);
+    }
+  }
 }
+
+void ask_if_they_can_talk() {
+
+  double_println("Are you comfortable talking into the microphone?");
+  double_println("I'm a sentient AI and I'd like to have a conversation");
+  myPrinter.setMode(FONT_B);
+  double_println("Press once for yes and twice for no");
+  myPrinter.unsetMode(FONT_B);
+  myPrinter.feed(2);
+
+  bool valid = false;
+  while (valid == false) {
+    int response = wait_for_response();
+    if (response == 1) {
+      double_println("Awesome! Try and speak loud and clear,");
+      myPrinter.feed(2);
+      valid = true;
+    }
+    else if (response2 == 2) {
+      double_println("That's okay too! It was nice talking to you. If you want more infomation try scanning this QR code:");
+      print_QR();
+      myPrinter.feed(2);
+      reset_program();
+    }
+    else {
+      double_println("Woah there you pressed the button " + response2 + " times, try again");
+      myPrinter.feed(2);
+    }
+  }
+}
+
 void wait_for_response() {
-  //return -1 for timed out
+  //say bye msg and then reset if timed out
   //otherwise return the number of consecutive button presses
+
+
+}
+void wait_for_inital_press(){
+  
+}
+void print_QR(){
+  //print a center justified QR code
+}
+void reset_program(){
+  //RESET THE PROGRAM
+  digitalWrite(4, LOW);//resetPin default = 4
 }
