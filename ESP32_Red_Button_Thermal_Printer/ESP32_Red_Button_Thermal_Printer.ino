@@ -24,28 +24,11 @@ void setup() {
   myPrinter.begin();
 
   //myPrinter.disableDtr();
-  myPrinter.setHeat(9,186,2);
+  myPrinter.setHeat(9, 186, 2);
   myPrinter.autoCalculate(true);
-  
-  //myPrinter.setMode(UPSIDE_DOWN);
-  //myPrinter.println("DEFAULT FONT_A");
-  myPrinter.setMode(DOUBLE_WIDTH, DOUBLE_HEIGHT);
-  myPrinter.feed(2);
-  double_print("HEY!");
-  
-  myPrinter.setMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
-  double_println(" My name's Bill!");
-  
-  myPrinter.unsetMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
-  double_println("and I've got a qustion for you,");
-  myPrinter.feed(1);
-  double_println("Are you old enough to vote?");
 
-  myPrinter.setMode(FONT_B);
-  double_println("Press once for yes and twice for no");
-  //myPrinter.setMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
-  
-  myPrinter.feed(2);
+  beginning_sequence();
+
   //myPrinter.identifyChars("ą ę");  // UTF-8
 }
 
@@ -54,11 +37,100 @@ void loop() {
   myPrinter.printFromSerial();  // open monitor and print something
 }
 
-void double_print(String str){
+void double_print(String str) {
   myPrinter.print(str);
-  Serial.println("> "+ str);
+  Serial.println("> " + str);
 }
-void double_println(String str){
+void double_println(String str) {
   myPrinter.println(str);
   Serial.println("> " + str);
+}
+void beginning_sequence() {
+  //myPrinter.setMode(UPSIDE_DOWN);
+  //myPrinter.println("DEFAULT FONT_A");
+  myPrinter.setMode(DOUBLE_WIDTH, DOUBLE_HEIGHT);
+  //myPrinter.feed(2);
+  double_print("HEY!");
+
+  myPrinter.setMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
+  double_println(" My name's Bill!");
+
+  myPrinter.unsetMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
+  double_println("and I've got a qustion for you,");
+  myPrinter.feed(1);
+  double_println("Are you old enough to vote?");
+
+  myPrinter.setMode(FONT_B);
+  double_println("Press once for yes and twice for no or three times if you don't know the voting age");
+  //myPrinter.setMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
+
+  myPrinter.feed(2);
+
+  myPrinter.println("DEFAULT FONT_A");
+
+  bool valid_response = false;
+  while (valid_response == false) {
+    int response1 = wait_for_response();
+    
+    if (response1 == 1) {
+      double_println("That's awesome! I wish I was old enough");
+      myPrinter.feed(2);
+      valid_response = true;
+    }
+    else if (response1 == 2) {
+      double_println("Do you think the voting age should be reduced so that you can vote?");
+      double_println("Press once for yes and twice for no");
+      myPrinter.feed(2);
+
+      bool valid2 = false;
+      while(valid2 == false){
+        int response2 = wait_for_response();
+        if (response2 == 1) {
+          double_println("Really!? but you cant even drink yet!,");
+          myPrinter.feed(2);
+          valid2 = true;
+        } 
+        else if (response2 == 2){
+          double_println("Wow you must be mature for your age");
+          myPrinter.feed(2);
+          valid2 = true;
+        }
+        else{
+          double_println("Woah there you pressed the button " + response2 + " times, try again");
+          myPrinter.feed(2);
+        }
+      }
+      valid_response = true;
+      
+    }
+    else if (response1 == 3){
+      double_println("The legal age to vote in Canada is 18, try answering again");
+      myPrinter.feed(2);
+    }
+    else if (response1 == -1) {
+      //RESET THE PROGRAM
+      digitalWrite(4, LOW);//resetPin default = 4
+    }
+    else {
+      double_println("Woah there you pressed the button " + response1 + " times, try again");
+      myPrinter.feed(2);
+    }
+  }
+  
+  double_println("In that case I've got another qustion for you,");
+
+  myPrinter.feed(1);
+  double_println("Are you comfortable talking into the microphone?");
+
+  myPrinter.setMode(FONT_B);
+  double_println("Press once for yes and twice for no");
+  //myPrinter.setMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
+
+  myPrinter.feed(2);
+
+  wait_for_response();
+}
+void wait_for_response() {
+  //return -1 for timed out
+  //otherwise return the number of consecutive button presses
 }
