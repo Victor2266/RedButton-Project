@@ -8,6 +8,7 @@ const int printerBaudrate = 19200;  // or 19200 usually
 const byte rxPin = 1;   // check datasheet of your board
 const byte txPin = 0;   // check datasheet of your board
 const int resetPin = 4;
+const int buttonPin = 5;
 //const byte dtrPin = 4;   // if used
 
 HardwareSerial mySerial(1);
@@ -16,6 +17,8 @@ Tprinter myPrinter(&mySerial, printerBaudrate);
 void setup() {
   digitalWrite(resetPin, HIGH);
   pinMode(resetPin, OUTPUT);
+  pinMode(buttonPin, INPUT);
+
   micros();
   Serial.begin(19200);
   Serial.println("\n\n [STARTED PROGRAM] \n (Ignore the weird symbols above)");
@@ -27,13 +30,13 @@ void setup() {
   myPrinter.setHeat(9, 186, 2);
   myPrinter.autoCalculate(true);
 
-  
+
   bool waiting = true;
-  while(waiting){
+  while (waiting) {
     waiting = wait_for_inital_press();
     myPrinter.printFromSerial();  // open monitor and print something
   }
-  
+
   beginning_sequence();
 
   //myPrinter.identifyChars("ą ę");  // UTF-8
@@ -55,6 +58,8 @@ void double_println(String str) {
 void beginning_sequence() {
   //myPrinter.setMode(UPSIDE_DOWN);
   //myPrinter.println("DEFAULT FONT_A");
+  wait_for_inital_press();
+
   myPrinter.setMode(DOUBLE_WIDTH, DOUBLE_HEIGHT);
   //myPrinter.feed(2);
   double_print("HEY!");
@@ -105,7 +110,9 @@ void ask_if_they_can_vote() {
       myPrinter.feed(2);
     }
     else {
-      double_println("Woah there you pressed the button " + response1 + " times, try again");
+      double_print("Woah there you pressed the button ");
+      double_print(String(response1));
+      double_println(" times, try again");
       myPrinter.feed(2);
     }
   }
@@ -131,7 +138,9 @@ void ask_if_voting_age_should_be_reduced() {
       valid2 = true;
     }
     else {
-      double_println("Woah there you pressed the button " + response2 + " times, try again");
+      double_print("Woah there you pressed the button ");
+      double_print(String(response2));
+      double_println(" times, try again");
       myPrinter.feed(2);
     }
   }
@@ -154,32 +163,71 @@ void ask_if_they_can_talk() {
       myPrinter.feed(2);
       valid = true;
     }
-    else if (response2 == 2) {
+    else if (response == 2) {
       double_println("That's okay too! It was nice talking to you. If you want more infomation try scanning this QR code:");
       print_QR();
       myPrinter.feed(2);
       reset_program();
     }
     else {
-      double_println("Woah there you pressed the button " + response2 + " times, try again");
+      double_print("Woah there you pressed the button ");
+      double_print(String(response));
+      double_println(" times, try again");
       myPrinter.feed(2);
     }
   }
 }
 
-void wait_for_response() {
+int wait_for_response() {
   //say bye msg and then reset if timed out
   //otherwise return the number of consecutive button presses
+  //include a serial override by typing y or n
+  while (true) {
+    wait();
+    
+    while (Serial.available()) {
+      char sign{};
+      sign = (char)Serial.read();
 
+      if (sign == 'y') {
+        double_println("You responded with yes");
+        Serial.flush();
+      }
+      else if (sign == 'n'){
+        double_println("You responded with no");
+        Serial.flush();
+      }
+    }
+    check_for_button_presses();
+    
+  }
 
 }
-void wait_for_inital_press(){
+bool wait_for_inital_press() {
+  bool started = false;
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, HIGH);
+  int counter = 0;
   
+  while (started == false) {
+    if (digitalRead(buttonPin) == HIGH) {
+      started = true;
+      digitalWrite(ledPin, LOW);
+    }
+    myPrinter.wait();
+    counter++;
+    if(counter == 50){
+      digitalWrite(ledPin, !digitalRead(ledPin))
+      counter = 0;
+    }
+  }
+  return true;
 }
-void print_QR(){
+
+void print_QR() {
   //print a center justified QR code
 }
-void reset_program(){
+void reset_program() {
   //RESET THE PROGRAM
   digitalWrite(4, LOW);//resetPin default = 4
 }
