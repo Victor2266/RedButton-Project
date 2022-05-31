@@ -400,10 +400,10 @@ void Tprinter::checkForCommand(char sign) {
         Serial.println("[This is a list of commands]");
         Serial.println("/h (Lists all commands)");
         Serial.println("/c (toggle inactivity, users will be redirected)");
-        Serial.println("/t 4:30AM 3:00PM (sets the availability times)");
+        Serial.println("/t XX:XXAM-XX:XXPM (sets the availability times)");
         Serial.println("/s (send thank you, closing message & QR code)");
         Serial.println("/r (reset program)");
-      } 
+      }
       else if (nextChar == 's') {
         String end_msg = "Thanks for talking with me, \n check out our website at www.futureofengagement.com \n or visit this QR code:";
         Serial.println("> " + end_msg);
@@ -412,22 +412,30 @@ void Tprinter::checkForCommand(char sign) {
         Serial.println("  [Pull Down To Rip Out This Reciept]");
         println("[Pull Down To Rip Out This Reciept]");
         feed(2);
-      } 
+      } else if (nextChar == 't') {
+          open_hours = "";
+          while (Serial.available()) {
+            char sign{};
+            sign = (char)Serial.read();
+            
+            open_hours += sign;
+          }
+      }
       else if (nextChar == 'c') {
         if (operator_available) {
           operator_available = false;
           Serial.println("[Program is set to INACTIVE]");
           Serial.println("Users will be sent to website and told availability hours)");
-        } 
+        }
         else {
           operator_available = true;
           Serial.println("[Program is set to ACTIVE]");
           Serial.println("Get ready to respond when users press the button");
         }
-      } 
+      }
       else if (nextChar == 'r') {
         digitalWrite(4, LOW);//resetPin default = 4
-      } 
+      }
       else if (nextChar = '\n') {
         Serial.println("[No command detected] (try /h for help)");
       }

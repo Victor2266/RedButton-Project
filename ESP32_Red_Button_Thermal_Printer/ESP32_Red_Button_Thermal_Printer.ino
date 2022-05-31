@@ -235,6 +235,13 @@ bool wait_for_inital_press() {
       started = true;
       digitalWrite(ledPin, LOW);
     }
+    else if (digitalRead(buttonPin) == HIGH && myPrinter.operator_available == false){
+      digitalWrite(ledPin, LOW);
+      myPrinter.setMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
+      double_println("Sorry!");
+      myPrinter.unsetMode(DOUBLE_WIDTH, DOUBLE_HEIGHT);
+      double_println("Bill is on an errand try again " + myPrinter.open_hours);
+    }
     vTaskDelay(1);
     while (Serial.available()) {
       char sign{};

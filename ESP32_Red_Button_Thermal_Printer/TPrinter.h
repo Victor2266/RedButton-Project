@@ -144,6 +144,7 @@ class Tprinter : public Print {
  public:
   Tprinter(Stream *s, int baud = 9600);
   bool operator_available{true}; //added to keep track of operator availablility 
+  String open_hours = "Later";
   
   size_t write(uint8_t sign);  // from inherited Print class, you can use println() ...
 
