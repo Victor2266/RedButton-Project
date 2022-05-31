@@ -408,6 +408,10 @@ void Tprinter::checkForCommand(char sign) {
         String end_msg = "Thanks for talking with me, \n check out our website at www.futureofengagement.com \n or visit this QR code:";
         Serial.println("> " + end_msg);
         print(end_msg);
+        print_QR();
+        Serial.println("  [Pull Down To Rip Out This Reciept]");
+        println("[Pull Down To Rip Out This Reciept]");
+        feed(2);
       } 
       else if (nextChar == 'c') {
         if (operator_available) {
@@ -432,7 +436,9 @@ void Tprinter::checkForCommand(char sign) {
     feed(2);
   }
 }
-
+void Tprinter::print_QR() {
+  //print a center justified QR code
+}
 void Tprinter::printCharset() {
   wait();
   println();

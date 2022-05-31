@@ -103,8 +103,7 @@ class Tprinter : public Print {
   bool
       busyState = HIGH,
       calculateMode{true},
-      dtrEnabled{false},
-      operator_available{true}; //added to keep track of operator availablility 
+      dtrEnabled{false};
   // tested:
   // when printer stop being busy, it's doesn't mean end of printing
   // dtr pin informs about the availability of the printer's firmware - propably;
@@ -144,7 +143,8 @@ class Tprinter : public Print {
 
  public:
   Tprinter(Stream *s, int baud = 9600);
-
+  bool operator_available{true}; //added to keep track of operator availablility 
+  
   size_t write(uint8_t sign);  // from inherited Print class, you can use println() ...
 
   void feed(uint8_t n = 1),                     // feed n lines
@@ -200,7 +200,8 @@ class Tprinter : public Print {
       // use below only if printer use hardware serial
       identifyChars(char *tab),  // require Serial.print(baudrate); in void setup()
       printFromSerial(),         // require Serial.print(baudrate); in void setup()
-      checkForCommand(char sign); //added for checking the serial monitor for /h type commands
+      checkForCommand(char sign), //added for checking the serial monitor for /h type commands
+      print_QR();
   uint16_t printPosition();      // require Serial.print(baudrate); in void setup();
 };
 

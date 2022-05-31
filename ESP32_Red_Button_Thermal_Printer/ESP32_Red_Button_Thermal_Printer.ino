@@ -9,6 +9,10 @@ const byte rxPin = 1;   // check datasheet of your board
 const byte txPin = 0;   // check datasheet of your board
 const int resetPin = 4;
 const int buttonPin = 5;
+byte butLst;
+enum { None, SingleClick, DoubleClick };
+
+const int ledPin = 6;
 //const byte dtrPin = 4;   // if used
 
 HardwareSerial mySerial(1);
@@ -18,24 +22,20 @@ void setup() {
   digitalWrite(resetPin, HIGH);
   pinMode(resetPin, OUTPUT);
   pinMode(buttonPin, INPUT);
-
+  //pinMode (buttonPin, INPUT_PULLUP);
+  butLst = digitalRead (buttonPin);
+  pinMode(buttonPin, OUTPUT);
+  
   micros();
   Serial.begin(19200);
-  Serial.println("\n\n [STARTED PROGRAM] \n (Ignore the weird symbols above)");
-  Serial.println("   Whatever you type into the terminal will be sent to the printer, \n   type /h for a list of commands you can do \n   don't use / in your messages because it is used for commands \n\n   Whenever you see > that means that message was sent to the printer\n   and = means it was their response \n");
+  Serial.println("\n\n [STARTED PROGRAM][ACTIVE] \n (Ignore the weird symbols above)");
+  Serial.println("   Whatever you type into the terminal will be sent to the printer, \n   type /h for a list of commands you can do \n   don't use / in your messages because it is used for commands \n   You can type y or n to force an answer for testing purposes \n\n   Whenever you see > that means that message was sent to the printer\n   and = means it was their response \n");
   mySerial.begin(printerBaudrate, SERIAL_8N1, rxPin, txPin);  // must be 8N1 mode
   myPrinter.begin();
 
   //myPrinter.disableDtr();
   myPrinter.setHeat(9, 186, 2);
   myPrinter.autoCalculate(true);
-
-
-  bool waiting = true;
-  while (waiting) {
-    waiting = wait_for_inital_press();
-    myPrinter.printFromSerial();  // open monitor and print something
-  }
 
   beginning_sequence();
 
@@ -84,7 +84,8 @@ void ask_if_they_can_vote() {
   double_println("Are you old enough to vote?");
 
   myPrinter.setMode(FONT_B);
-  double_println("Press once for yes and twice for no or three times if you don't know the voting age");
+  double_println("Press once for yes and twice for no");
+  double_println("(The legal age to vote in Canada is 18)");
   //myPrinter.setMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
 
   myPrinter.feed(2);
@@ -165,7 +166,8 @@ void ask_if_they_can_talk() {
     }
     else if (response == 2) {
       double_println("That's okay too! It was nice talking to you. If you want more infomation try scanning this QR code:");
-      print_QR();
+      myPrinter.print_QR();
+      double_println("[Pull Down to rip out this reciept]");
       myPrinter.feed(2);
       reset_program();
     }
@@ -183,51 +185,109 @@ int wait_for_response() {
   //otherwise return the number of consecutive button presses
   //include a serial override by typing y or n
   while (true) {
-    wait();
-    
+    vTaskDelay(1);
+
     while (Serial.available()) {
       char sign{};
       sign = (char)Serial.read();
-
+      
+      myPrinter.checkForCommand(sign);
+      
       if (sign == 'y') {
         double_println("You responded with yes");
         Serial.flush();
+        return 1;
       }
-      else if (sign == 'n'){
+      else if (sign == 'n') {
         double_println("You responded with no");
         Serial.flush();
+        return 2;
       }
     }
-    check_for_button_presses();
-    
+    int presses = check_for_button_presses();
+    if (presses != 0){
+      return presses;
+    }
+
   }
 
+}
+int check_for_button_presses() {
+  switch (chkButton ())  {
+    case SingleClick:
+      Serial.println ("[Button was pressed once]");
+      return 1;
+
+    case DoubleClick:
+      Serial.println ("[Button was pressed twice]");
+      return 2;
+  }
+  return 0;
 }
 bool wait_for_inital_press() {
   bool started = false;
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, HIGH);
   int counter = 0;
-  
+
   while (started == false) {
-    if (digitalRead(buttonPin) == HIGH) {
+    if (digitalRead(buttonPin) == HIGH && myPrinter.operator_available) {
       started = true;
       digitalWrite(ledPin, LOW);
     }
-    myPrinter.wait();
+    vTaskDelay(1);
+    while (Serial.available()) {
+      char sign{};
+      sign = (char)Serial.read();
+      
+      myPrinter.checkForCommand(sign);
+      if (sign == 'y' || sign == 'n') {
+        double_println("You forced the script to run");
+        started = true;
+        digitalWrite(ledPin, LOW);
+        return true;
+      }
+    }
     counter++;
-    if(counter == 50){
-      digitalWrite(ledPin, !digitalRead(ledPin))
+    if (counter == 150) {
+      digitalWrite(8, !digitalRead(ledPin));
       counter = 0;
     }
   }
   return true;
 }
 
-void print_QR() {
-  //print a center justified QR code
-}
+
 void reset_program() {
   //RESET THE PROGRAM
   digitalWrite(4, LOW);//resetPin default = 4
+}
+int chkButton (void)
+{
+  const  unsigned long ButTimeout  = 800;
+  static unsigned long msecLst;
+  unsigned long msec = millis ();
+
+  if (msecLst && (msec - msecLst) > ButTimeout)  {
+    msecLst = 0;
+    return SingleClick;
+  }
+
+  byte but = digitalRead (buttonPin);
+  if (butLst != but)  {
+    butLst = but;
+    delay (10);           // **** debounce
+    
+    if (HIGH == but)  {   // press
+      if (msecLst)  { // 2nd press
+        msecLst = 0;
+        return DoubleClick;
+      }
+      else
+        msecLst = 0 == msec ? 1 : msec;
+      
+    }
+  }
+
+  return 0;
 }
