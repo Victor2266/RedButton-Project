@@ -14,7 +14,10 @@ enum { None, SingleClick, DoubleClick };
 
 const int ledPin = 6;
 //const byte dtrPin = 4;   // if used
-
+bool beginning = false;
+bool operator_available{true}; //added to keep track of operator availablility 
+String open_hours = "Later";
+  
 HardwareSerial mySerial(1);
 Tprinter myPrinter(&mySerial, printerBaudrate);
 
@@ -43,8 +46,12 @@ void setup() {
 }
 
 void loop() {
+  if (beginning == true){
+    beginning_sequence();
+    beginning = false;
+  }
   myPrinter.setMode(FONT_B);
-  myPrinter.printFromSerial();  // open monitor and print something
+  printFromSerial();  // open monitor and print something
 }
 
 void double_print(String str) {
@@ -191,7 +198,7 @@ int wait_for_response() {
       char sign{};
       sign = (char)Serial.read();
       
-      myPrinter.checkForCommand(sign);
+      checkForCommand(sign);
       
       if (sign == 'y') {
         double_println("You responded with yes");
@@ -231,23 +238,23 @@ bool wait_for_inital_press() {
   int counter = 0;
 
   while (started == false) {
-    if (digitalRead(buttonPin) == HIGH && myPrinter.operator_available) {
+    if (digitalRead(buttonPin) == HIGH && operator_available) {
       started = true;
       digitalWrite(ledPin, LOW);
     }
-    else if (digitalRead(buttonPin) == HIGH && myPrinter.operator_available == false){
+    else if (digitalRead(buttonPin) == HIGH && operator_available == false){
       digitalWrite(ledPin, LOW);
       myPrinter.setMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
       double_println("Sorry!");
       myPrinter.unsetMode(DOUBLE_WIDTH, DOUBLE_HEIGHT);
-      double_println("Bill is on an errand try again " + myPrinter.open_hours);
+      double_println("Bill is on an errand try again " + open_hours);
     }
     vTaskDelay(1);
     while (Serial.available()) {
       char sign{};
       sign = (char)Serial.read();
       
-      myPrinter.checkForCommand(sign);
+      checkForCommand(sign);
       if (sign == 'y' || sign == 'n') {
         double_println("You forced the script to run");
         started = true;
@@ -297,4 +304,83 @@ int chkButton (void)
   }
 
   return 0;
+}
+void printFromSerial() {
+  // you can use it e.g for test;
+  // require Serial.begin(baudrate) in void setup()
+  myPrinter.wait();
+  if (Serial.available()) {
+    Serial.print("> ");
+  }
+  while (Serial.available()) {
+    char sign{};
+    sign = (char)Serial.read();
+
+    checkForCommand(sign);
+    if (sign != '/') {
+      Serial.print(sign);
+      myPrinter.print(sign);
+    }
+
+  }
+}
+
+void checkForCommand(char sign) {
+  if (sign == '/') {
+    Serial.println("");
+    if (Serial.available()) {
+      char nextChar{};
+      nextChar = (char)Serial.read();
+      myPrinter.println(nextChar);
+      if (nextChar == 'h') {
+        Serial.println("[This is a list of commands]");
+        Serial.println("/h (Lists all commands)");
+        Serial.println("/c (toggle inactivity, users will be redirected)");
+        Serial.println("/t XX:XXAM-XX:XXPM (sets the availability times)");
+        Serial.println("/s (send thank you, closing message & QR code)");
+        Serial.println("/b (Prepare for new person)");
+        Serial.println("/r (hard reset program)");
+      }
+      else if (nextChar == 's') {
+        String end_msg = "Thanks for talking with me, \n check out our website at www.futureofengagement.com \n or visit this QR code:";
+        Serial.println("> " + end_msg);
+        myPrinter.print(end_msg);
+        myPrinter.print_QR();
+        Serial.println("  [Pull Down To Rip Out This Reciept]");
+        myPrinter.println("[Pull Down To Rip Out This Reciept]");
+        myPrinter.feed(2);
+      } else if (nextChar == 't') {
+          open_hours = "";
+          while (Serial.available()) {
+            char sign{};
+            sign = (char)Serial.read();
+            
+            open_hours += sign;
+          }
+      }
+      else if (nextChar == 'c') {
+        if (operator_available) {
+          operator_available = false;
+          Serial.println("[Program is set to INACTIVE]");
+          Serial.println("Users will be sent to website and told availability hours)");
+        }
+        else {
+          operator_available = true;
+          Serial.println("[Program is set to ACTIVE]");
+          Serial.println("Get ready to respond when users press the button");
+        }
+      }
+      else if (nextChar == 'r') {
+        digitalWrite(4, LOW);//resetPin default = 4
+      }
+      else if (nextChar == 'b') {
+        beginning = true;
+      }
+      else if (nextChar = '\n') {
+        Serial.println("[No command detected] (try /h for help)");
+      }
+    }
+  } else if (sign == '\n') {
+    myPrinter.feed(2);
+  }
 }
