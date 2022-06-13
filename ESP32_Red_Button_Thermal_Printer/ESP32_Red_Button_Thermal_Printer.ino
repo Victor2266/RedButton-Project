@@ -80,8 +80,9 @@ void beginning_sequence() {
 
   ask_if_they_can_vote(); //QUESTION #1
 
-  double_println("In that case I've got another qustion for you,");
-
+  double_print("In that case I've got another");
+  double_println("qustion for you,");
+  
   myPrinter.feed(1);
 
   ask_if_they_can_talk(); //QUESTION #2
@@ -106,6 +107,7 @@ void ask_if_they_can_vote() {
     if (response1 == 1) {
       double_println("That's awesome! I wish I was old enough");
       myPrinter.feed(2);
+      vTaskDelay(2000);
       valid_response = true;
     }
     else if (response1 == 2) {
@@ -157,7 +159,7 @@ void ask_if_voting_age_should_be_reduced() {
 void ask_if_they_can_talk() {
 
   double_println("Are you comfortable talking into the microphone?");
-  double_println("I'm a sentient AI and I'd like to have a conversation");
+  double_println("Im a sentient AI and I'd like to have a conversation");
   myPrinter.setMode(FONT_B);
   double_println("Press once for yes and twice for no");
   myPrinter.unsetMode(FONT_B);
@@ -346,8 +348,9 @@ void checkForCommand(char sign) {
         Serial.println("> " + end_msg);
         myPrinter.print(end_msg);
         myPrinter.print_QR();
-        Serial.println("  [Pull Down To Rip Out This Reciept]");
-        myPrinter.println("[Pull Down To Rip Out This Reciept]");
+        Serial.println("  [Rip Out This Reciept]");
+        myPrinter.println("[Rip Out This Reciept]");
+        myPrinter.println("--------------------------------");
         myPrinter.feed(2);
       } else if (nextChar == 't') {
           open_hours = "";
