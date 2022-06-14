@@ -272,7 +272,7 @@ bool wait_for_inital_press() {
     }
     counter++;
     if (counter == 150) {
-      digitalWrite(8, !digitalRead(ledPin));
+      digitalWrite(ledPin, !digitalRead(ledPin));
       counter = 0;
     }
   }
@@ -329,7 +329,9 @@ void printFromSerial() {
       Serial.print(sign);
       myPrinter.print(sign);
     }
-
+    if (sign == '\n'){
+      myPrinter.feed(2);
+    }
   }
 }
 
@@ -389,7 +391,9 @@ void checkForCommand(char sign) {
         Serial.println("[No command detected] (try /h for help)");
       }
     }
-  }
+    return;
+  } 
+  
 }
 void sendClosingMSG(){
   String end_msg = "It ws nice talking to ya,\nVisit www.futureofengagement.ca\n or Please scan this QR code:";
