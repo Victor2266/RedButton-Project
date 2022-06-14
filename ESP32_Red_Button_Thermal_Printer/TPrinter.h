@@ -198,8 +198,8 @@ class Tprinter : public Print {
       // use below only if printer use hardware serial
       identifyChars(char *tab),  // require Serial.print(baudrate); in void setup()
       printFromSerial(),         // require Serial.print(baudrate); in void setup()
-      checkForCommand(char sign), //added for checking the serial monitor for /h type commands
-      print_QR();
+      checkForCommand(char sign); //added for checking the serial monitor for /h type commands
+      
   uint16_t printPosition();      // require Serial.print(baudrate); in void setup();
 };
 

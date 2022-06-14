@@ -369,9 +369,6 @@ void Tprinter::identifyChars(char *tab) {
   } while (tab[i] != 0);  // end of string
 }
 
-void Tprinter::print_QR() {
-  //print a center justified QR code
-}
 void Tprinter::printCharset() {
   wait();
   println();
