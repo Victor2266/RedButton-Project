@@ -175,12 +175,12 @@ void ask_if_they_can_talk() {
       myPrinter.setMode(FONT_B);
       double_println("That's okay too! It was nice talking to ya");
       double_println("Please scan this QR code:");
-      myPrinter.unsetMode(FONT_B);
       printQRcode();
         Serial.println("  [Rip Out This Reciept]");
         myPrinter.println("Rip Out This Reciept");
         myPrinter.println("--------------------------------");
-
+      
+      myPrinter.unsetMode(FONT_B);
       myPrinter.feed(3);
       reset_program();
     }
@@ -271,8 +271,12 @@ bool wait_for_inital_press() {
       }
     }
     counter++;
-    if (counter == 150) {
-      digitalWrite(ledPin, !digitalRead(ledPin));
+    if (counter < 25){
+      digitalWrite(ledPin, HIGH);
+    } else{
+      digitalWrite(ledPin, LOW);
+    }
+    if (counter == 750) {
       counter = 0;
     }
   }
@@ -354,6 +358,7 @@ void checkForCommand(char sign) {
       }
       else if (nextChar == 's') {
         sendClosingMSG();
+        reset_program();
       } 
       else if (nextChar == 'c') {
         open_hours = "";
@@ -385,7 +390,7 @@ void checkForCommand(char sign) {
         }
       }
       else if (nextChar == 'r') {
-        digitalWrite(4, LOW);//resetPin default = 4
+        reset_program();
       }
       else if (nextChar = '\n') {
         Serial.println("[No command detected] (try /h for help)");
@@ -396,14 +401,18 @@ void checkForCommand(char sign) {
   
 }
 void sendClosingMSG(){
+  myPrinter.setMode(FONT_B);
+  
   String end_msg = "It ws nice talking to ya,\nVisit www.futureofengagement.ca\n or Please scan this QR code:";
         Serial.println("> " + end_msg);
         myPrinter.print(end_msg);
         printQRcode();
         Serial.println("  [Rip Out This Reciept]");
         myPrinter.println("Rip Out This Reciept");
-        myPrinter.println("--------------------------------");
+        myPrinter.println("------------------------------------------");
+        myPrinter.unsetMode(FONT_B);
         myPrinter.feed(2);
+  
 }
 
 const uint8_t bitmapWidth = 56;
