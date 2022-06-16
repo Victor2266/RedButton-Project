@@ -6,6 +6,10 @@ The thermal printer code is referenced from: https://github.com/BinaryWorlds/The
 
 An operator is intended to remote into an android phone or raspberry pi or pc nearby to pilot the device using a serial cli terminal.
 
+https://user-images.githubusercontent.com/46388269/173976027-5355ccf5-84ab-41fb-acef-1997f1d6e988.mp4
+
+https://user-images.githubusercontent.com/46388269/173976036-4f9d2b7e-b030-4ef2-b05f-c1840540e568.mp4
+
 User Experience / Interaction loop:
 - User sees a table with a big red button
 - User presses button
@@ -23,3 +27,7 @@ Goals of Project:
 - Is it possible to engage youth, stimulate social media, and get students involved in local politics
 - Get youths to talk to their families about local politics
 - Collect contact information
+
+
+
+
