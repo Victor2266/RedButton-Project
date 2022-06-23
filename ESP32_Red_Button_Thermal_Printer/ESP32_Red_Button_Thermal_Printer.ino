@@ -335,7 +335,7 @@ void printFromSerial() {
       myPrinter.print(sign);
     }
     if (sign == '\n'){
-      myPrinter.feed(2);
+      myPrinter.feed(3);
     } 
   }
 }
@@ -418,7 +418,7 @@ void sendClosingMSG(){
         myPrinter.println("Rip Out This Reciept");
         myPrinter.println("------------------------------------------");
         myPrinter.unsetMode(FONT_B);
-        myPrinter.feed(2);
+        myPrinter.feed(3);
   
 }
 
