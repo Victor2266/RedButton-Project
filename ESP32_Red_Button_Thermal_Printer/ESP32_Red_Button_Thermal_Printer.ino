@@ -95,7 +95,7 @@ void ask_if_they_can_vote() {
   //myPrinter.setMode(FONT_B, DOUBLE_WIDTH, DOUBLE_HEIGHT);
 
   myPrinter.unsetMode(FONT_B);
-  myPrinter.feed(2);
+  myPrinter.feed(3);
   
   bool valid_response = false;
   while (valid_response == false) {
@@ -179,9 +179,9 @@ void ask_if_they_can_talk() {
         Serial.println("  [Rip Out This Reciept]");
         myPrinter.println("Rip Out This Reciept");
         myPrinter.println("--------------------------------");
-      
-      myPrinter.unsetMode(FONT_B);
-      myPrinter.feed(3);
+        myPrinter.unsetMode(FONT_B);
+        myPrinter.feed(3);
+        myPrinter.wait();
       reset_program();
     }
     else {
@@ -254,7 +254,7 @@ bool wait_for_inital_press() {
       double_println("Sorry!");
       myPrinter.unsetMode(DOUBLE_WIDTH, DOUBLE_HEIGHT);
       double_println("Bill is on an errand try again " + open_hours);
-      myPrinter.feed(2);
+      myPrinter.feed(3);
       vTaskDelay(2000);
     }
     vTaskDelay(1);
@@ -329,13 +329,14 @@ void printFromSerial() {
     sign = (char)Serial.read();
 
     checkForCommand(sign);
+
     if (sign != '/') {
       Serial.print(sign);
       myPrinter.print(sign);
     }
     if (sign == '\n'){
       myPrinter.feed(2);
-    }
+    } 
   }
 }
 
@@ -355,6 +356,11 @@ void checkForCommand(char sign) {
         Serial.println("/s (send thank you, closing message & QR code)");
         Serial.println("/r (hard reset program)");
         Serial.println("");
+        Serial.flush();
+        while (Serial.available()) {
+          char nextChar{};
+          nextChar = (char)Serial.read();
+        }
       }
       else if (nextChar == 's') {
         sendClosingMSG();
@@ -385,6 +391,7 @@ void checkForCommand(char sign) {
         }
         else {
           operator_available = true;
+          beginning = false;
           Serial.println("[Program is set to ACTIVE]");
           Serial.println("Get ready to respond when users press the button");
         }
