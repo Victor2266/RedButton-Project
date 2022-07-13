@@ -6,6 +6,7 @@ The thermal printer code is referenced from: https://github.com/BinaryWorlds/The
 
 An operator is intended to remote into an android phone or raspberry pi or pc nearby to pilot the device using a serial cli terminal.
 
+![DSC00077](https://user-images.githubusercontent.com/46388269/178654127-158dea39-8cc2-4bc6-b72f-4df4ed3aa62c.JPG)
 
 https://user-images.githubusercontent.com/46388269/175608073-17dcefab-360d-4a30-a899-82d71f194d39.mp4
 
