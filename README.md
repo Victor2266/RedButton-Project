@@ -1,7 +1,7 @@
 # RedButton-Project
 This is the WIP code for an interactive installment to promote political awareness to youths. 
-This was programmed in the Arduino IDE but made compatible with the ESP32 microcontroller and intended to be paired with 
-Mini Thermal Receipt Printer : ID 597 although the printing parameters can be changed for other thermal printers.
+This was programmed in the Arduino IDE but made compatible with the ESP32 microcontroller and intended to be paired
+with the Adafruit Mini Thermal Receipt Printer: ID 597, although the printing parameters can be changed for other thermal printers.
 The thermal printer code is referenced from: https://github.com/BinaryWorlds/ThermalPrinter 
 
 An operator is intended to remote into an android phone or raspberry pi or pc nearby to pilot the device using a serial cli terminal.
