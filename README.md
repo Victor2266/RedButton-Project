@@ -17,16 +17,15 @@ https://user-images.githubusercontent.com/46388269/173976027-5355ccf5-84ab-41fb-
 https://user-images.githubusercontent.com/46388269/173976036-4f9d2b7e-b030-4ef2-b05f-c1840540e568.mp4
 
 User Experience / Interaction loop:
-- User sees a table with a big red button
-- User presses button
-- A receipt is printed through a slot on the table asking them a scripted question
+- A student sees the table with a big red button
+- Curious students press the button
+- A receipt is printed through a slot on the table asking them a question
 - They reply with a yes or no by pressing the button once or twice.
-- They get a scripted reply or a QR code to redirect them the organization website.
 
-- If they are okay with speaking then more open ended questions are asked and they respond through a microphone 
--  The operator can then type witty remarks to their answers
--  Eventually they get to ask a question which the operator would then answer.
--  After the interaction is over a QR code would be printed to redirect towards a landing page where addtional information is collected and the organization is introduced to the users.
+- If they are okay with speaking then more open-ended questions are asked and they respond through a microphone
+- The operator can then type witty remarks to their answers
+- Eventually, they get to ask a question which the operator would then answer.
+- After the interaction is over a QR code would be printed to redirect towards a landing page where additional information is collected and the organization is introduced to the users.
 
 Goals of Project:
 - Investigate whether a chatbot is worth building
