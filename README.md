@@ -1,4 +1,7 @@
 # RedButton-Project
+Check out: http://victordo.com/red-button-project/ for more details
+
+
 This is the WIP code for an interactive installment to promote political awareness to youths. 
 This was programmed in the Arduino IDE but made compatible with the ESP32 microcontroller and intended to be paired
 with the Adafruit Mini Thermal Receipt Printer: ID 597, although the printing parameters can be changed for other thermal printers.
